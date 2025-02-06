@@ -84,6 +84,7 @@ public class ApiV1PostController {
     }
 
     @PostMapping
+    @Transactional
     public RsData<PostWithContentDto> write(@Valid @RequestBody WriteReqBody body) {
         Member writer = rq.getAuthenticatedWriter();
 
@@ -100,6 +101,7 @@ public class ApiV1PostController {
     }
 
     @PutMapping("/{id}")
+    @Transactional
     public RsData<PostWithContentDto> modify(@Valid @RequestBody ModifyReqBody body, @PathVariable long id) {
         Member writer = rq.getAuthenticatedWriter();
 
@@ -119,6 +121,7 @@ public class ApiV1PostController {
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     public RsData<Void> delete(@PathVariable long id) {
         Member writer = rq.getAuthenticatedWriter();
 
