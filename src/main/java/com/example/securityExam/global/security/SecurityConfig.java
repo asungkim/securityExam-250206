@@ -1,5 +1,7 @@
 package com.example.securityExam.global.security;
 
+import com.example.securityExam.global.dto.RsData;
+import com.example.securityExam.standard.Ut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +30,7 @@ public class SecurityConfig {
                                 "/api/*/posts",
                                 "/api/*/posts/{postId:\\d+}/comments")
                         .permitAll()
-                        .requestMatchers("/api/*/members/login","/api/*/members/join")
+                        .requestMatchers("/api/*/members/login", "/api/*/members/join")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
@@ -37,7 +39,21 @@ public class SecurityConfig {
                         .addHeaderWriter(new XFrameOptionsHeaderWriter(
                                 XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)))
                 .csrf(csrf -> csrf.disable())
-                .addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(customAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(
+                        exceptionHandling -> exceptionHandling
+                                .authenticationEntryPoint(
+                                        ((request, response, authException) -> {
+                                            response.setStatus(401);
+                                            response.setContentType("application/json;charset=UTF-8");
+                                            response.getWriter().write(
+                                                    Ut.json.toString(
+                                                            new RsData<Void>("401-1", "잘못된 인증키입니다.")
+                                                    )
+                                            );
+                                        })
+                                )
+                );
         return http.build();
     }
 }
