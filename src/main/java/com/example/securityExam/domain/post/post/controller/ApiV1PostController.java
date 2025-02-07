@@ -13,11 +13,10 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/posts")
@@ -90,14 +89,14 @@ public class ApiV1PostController {
 
     @PostMapping
     @Transactional
-    public RsData<PostWithContentDto> write(@Valid @RequestBody WriteReqBody body) {
+    public RsData<PostWithContentDto> write(@Valid @RequestBody WriteReqBody body,
+                                            @AuthenticationPrincipal UserDetails userDetails) {
 
-        Principal principal = SecurityContextHolder.getContext().getAuthentication();
-        if (principal==null) {
+        if (userDetails==null) {
             throw new ServiceException("401-1","로그인이 필요합니다.");
         }
 
-        String username = principal.getName();
+        String username = userDetails.getUsername();
         Member writer = memberService.findByUsername(username).get();
 
         Post post = postService.write(writer, body.title(), body.content(), body.published(), body.listed());
