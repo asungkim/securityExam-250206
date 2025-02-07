@@ -13,8 +13,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -89,17 +87,10 @@ public class ApiV1PostController {
 
     @PostMapping
     @Transactional
-    public RsData<PostWithContentDto> write(@Valid @RequestBody WriteReqBody body,
-                                            @AuthenticationPrincipal UserDetails userDetails) {
+    public RsData<PostWithContentDto> write(@Valid @RequestBody WriteReqBody body) {
 
-        if (userDetails==null) {
-            throw new ServiceException("401-1","로그인이 필요합니다.");
-        }
-
-        String username = userDetails.getUsername();
-        Member writer = memberService.findByUsername(username).get();
-
-        Post post = postService.write(writer, body.title(), body.content(), body.published(), body.listed());
+        Member actor = rq.getActor();
+        Post post = postService.write(actor, body.title(), body.content(), body.published(), body.listed());
 
         return new RsData<>(
                 "201-1",
@@ -113,14 +104,15 @@ public class ApiV1PostController {
 
     @PutMapping("/{id}")
     @Transactional
-    public RsData<PostWithContentDto> modify(@Valid @RequestBody ModifyReqBody body, @PathVariable long id) {
-        Member writer = rq.getAuthenticatedWriter();
+    public RsData<PostWithContentDto> modify(@Valid @RequestBody ModifyReqBody body,
+                                             @PathVariable long id) {
+        Member actor = rq.getActor();
 
         Post post = postService.getItem(id).orElseThrow(
                 () -> new ServiceException("404-1", "존재하지 않는 글입니다.")
         );
 
-        if (post.canModify(writer)) {
+        if (post.canModify(actor)) {
             postService.modify(post, body.title(), body.content());
 
         }
@@ -134,13 +126,13 @@ public class ApiV1PostController {
     @DeleteMapping("/{id}")
     @Transactional
     public RsData<Void> delete(@PathVariable long id) {
-        Member writer = rq.getAuthenticatedWriter();
+        Member actor = rq.getActor();
 
         Post post = postService.getItem(id).orElseThrow(
                 () -> new ServiceException("404-1", "존재하지 않는 글입니다.")
         );
 
-        if (post.canDelete(writer)) {
+        if (post.canDelete(actor)) {
             postService.delete(post);
         }
 
