@@ -288,7 +288,7 @@ class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 작성")
-    @WithUserDetails("user1")
+    @WithUserDetails("user3")
     void write1() throws Exception {
         String title = "new title";
         String content = "new content";
