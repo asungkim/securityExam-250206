@@ -1,4 +1,4 @@
-package com.example.securityExam.domain.controller;
+package com.example.securityExam.domain.member.controller;
 
 import com.example.securityExam.domain.member.member.entity.Member;
 import com.example.securityExam.domain.member.member.service.MemberService;
@@ -125,7 +125,7 @@ class ApiV1MemberControllerTest {
     }
 
     @Test
-    @DisplayName("로그인")
+    @DisplayName("로그인 - 성공")
     void login() throws Exception {
 
         String username = "user1";

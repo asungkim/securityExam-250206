@@ -49,8 +49,8 @@ public class ApiV1PostController {
             @RequestParam(defaultValue = "title") String keywordType,
             @RequestParam(defaultValue = "") String keyword) {
 
-        Member writer = rq.getAuthenticatedWriter();
-        Page<Post> pagePost = postService.getMines(writer, page, pageSize, keywordType, keyword);
+        Member actor = rq.getActor();
+        Page<Post> pagePost = postService.getMines(actor, page, pageSize, keywordType, keyword);
 
         return new RsData<>(
                 "200-1",
@@ -68,8 +68,8 @@ public class ApiV1PostController {
 
         // 비공개 글인 경우에만 인증을 하고 읽어본다. 공개글인 경우 로그인 하지 않은 사람도 확인 가능
         if (!post.isPublished()) {
-            Member writer = rq.getAuthenticatedWriter();
-            post.canRead(writer);
+            Member actor = rq.getActor();
+            post.canRead(actor);
         }
 
         return new RsData<>(
