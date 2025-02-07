@@ -69,12 +69,12 @@ public class ApiV1MemberController {
 
     @GetMapping("/me")
     public RsData<MemberDto> me() {
-        Member writer = rq.getAuthenticatedWriter();
+        Member actor = rq.getActor();
 
         return new RsData<>(
                 "200-1",
                 "내 정보 조회가 완료되었습니다.",
-                new MemberDto(writer)
+                new MemberDto(actor)
         );
     }
 }
