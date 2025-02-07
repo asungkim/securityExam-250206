@@ -288,11 +288,11 @@ class ApiV1PostControllerTest {
 
     @Test
     @DisplayName("글 작성")
-    @WithUserDetails("user3")
+    @WithUserDetails("user2")
     void write1() throws Exception {
         String title = "new title";
         String content = "new content";
-        String apiKey = "user1";
+        String apiKey = "user3";
 
         ResultActions resultActions = writeRequest(apiKey, title, content);
 
